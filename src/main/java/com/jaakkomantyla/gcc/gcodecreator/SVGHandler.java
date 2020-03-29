@@ -1,13 +1,12 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
 import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.dom.svg.SVGDocumentFactory;
 import org.apache.batik.dom.util.SAXDocumentFactory;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
+import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.*;
 
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,29 +41,80 @@ public class SVGHandler {
     }
 
 
+    public static void parse(){
+        DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setValidating(false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            String path = "C:/Users/Jaakko/Desktop/koulujutut/dynaaminen/GcodeCreator/testFiles/artrobot.svg";
+            File x = new File(path);
+            System.out.println(x.getName());
+            Document doc = documentBuilder.parse(new File(path));
 
-    public static boolean prettyPrintXml(File newFile) {
+
+
+
+            System.out.println(doc.toString());
+            //System.out.println(doc.getDoctype().toString());
+            System.out.println(doc.getNodeName());
+            printSvg(doc);
+
+
+
+
+
+            SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(doc);
+
+            SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
+
+
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+    }
+
+    public static byte[] prettyPrintXml(MultipartFile newFile) {
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setValidating(false);
             documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(newFile);
+            Document document = documentBuilder.parse(newFile.getInputStream());
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
-            StreamResult streamResult = new StreamResult(newFile);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            StreamResult streamResult = new StreamResult(out);
             DOMSource domSource = new DOMSource(document);
             transformer.transform(domSource, streamResult);
+
+            return out.toByteArray();
         } catch (Exception ex) {
             ex.printStackTrace();
-            return false;
+            return null;
         }
 
-        return true;
+    }
+
+    public static void printSvg(Node node){
+        System.out.println(node);
+        if(node.hasAttributes()){
+            NamedNodeMap map = node.getAttributes();
+            for(int i =0; i< map.getLength(); i++){
+                System.out.println(map.item(i));
+            }
+        }
+
+        NodeList l =  node.getChildNodes();
+        for(int i =0; i< l.getLength(); i++){
+            printSvg(l.item(i));
+        }
     }
 
 

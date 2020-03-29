@@ -10,8 +10,7 @@ public class GcodeCreatorApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(GcodeCreatorApplication.class, args);
-
-		SVGHandler.prettyPrintXml(new File("C:\\Users\\Jaakko\\Desktop\\koulujutut\\dynaaminen\\GcodeCreator\\testFiles\\engine.svg"));
+		SVGHandler.parse();
 	}
 
 }
