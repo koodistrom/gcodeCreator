@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.util.function.Consumer;
 
 public class SVGHandler {
 
@@ -114,6 +115,16 @@ public class SVGHandler {
         NodeList l =  node.getChildNodes();
         for(int i =0; i< l.getLength(); i++){
             printSvg(l.item(i));
+        }
+    }
+
+    public static void iterateSvg(Document document, Consumer<Node> doThings){
+        NodeList nodeList = document.getElementsByTagName("*");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                doThings.accept(node);
+            }
         }
     }
 
