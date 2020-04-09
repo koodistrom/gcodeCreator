@@ -1,9 +1,12 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
+import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
 import com.jaakkomantyla.gcc.gcodecreator.utils.BezierToArcs;
 import com.jaakkomantyla.gcc.gcodecreator.utils.BiArc;
 import com.jaakkomantyla.gcc.gcodecreator.utils.CubicBezier;
+import com.jaakkomantyla.gcc.gcodecreator.utils.ToGCodeHandler;
 import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.parser.*;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -13,10 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.geom.Point2D;
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 @SpringBootTest
@@ -62,7 +68,7 @@ class GcodeCreatorApplicationTests {
 			documentBuilderFactory.setValidating(false);
 			documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			String path = "C:/Users/Jaakko/Desktop/koulujutut/dynaaminen/GcodeCreator/testFiles/artrobot.svg";
+			String path = "C:/Users/Jaakko/Desktop/koulujutut/dynaaminen/GcodeCreator/testFiles/path1.svg";
 			File x = new File(path);
 			System.out.println(x.getName());
 			Document doc = documentBuilder.parse(new File(path));
@@ -73,8 +79,24 @@ class GcodeCreatorApplicationTests {
 			System.out.println(doc.toString());
 			//System.out.println(doc.getDoctype().toString());
 			System.out.println(doc.getNodeName());
-			SVGHandler.printSvg(doc);
+			//SVGHandler.printSvg(doc);
+			SVGHandler.iterateSvg(doc, node -> {
+				if(node.getNodeName().equals("path")) {
+					if(node.hasAttributes()){
+						NamedNodeMap map = node.getAttributes();
+						System.out.println(map.getNamedItem("d").getNodeValue());
+						pathDataToGcode(map.getNamedItem("d").getNodeValue());
+						/*for(int i =0; i< map.getLength(); i++){
 
+							System.out.println(map.item(i));
+						}
+
+						 */
+					}
+
+
+				}
+			});
 
 
 
@@ -88,6 +110,15 @@ class GcodeCreatorApplicationTests {
 			System.out.println(ex);
 		}
 
+	}
+
+	public static void pathDataToGcode(String s) throws ParseException {
+		Gcode gcode = new Gcode();
+		PathParser pp = new PathParser();
+		PathHandler ph = new ToGCodeHandler(gcode);
+		pp.setPathHandler(ph);
+		pp.parse(s);
+		gcode.printCommands();
 	}
 
 }

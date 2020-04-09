@@ -64,6 +64,54 @@ public class Arc {
         return r * Math.abs(sweepAngle);
     }
 
+    public Vector2D getCenter() {
+        return center;
+    }
+
+    public void setCenter(Vector2D center) {
+        this.center = center;
+    }
+
+    public float getR() {
+        return r;
+    }
+
+    public void setR(float r) {
+        this.r = r;
+    }
+
+    public float getStartAngle() {
+        return startAngle;
+    }
+
+    public void setStartAngle(float startAngle) {
+        this.startAngle = startAngle;
+    }
+
+    public float getSweepAngle() {
+        return sweepAngle;
+    }
+
+    public void setSweepAngle(float sweepAngle) {
+        this.sweepAngle = sweepAngle;
+    }
+
+    public Vector2D getStart() {
+        return start;
+    }
+
+    public void setStart(Vector2D start) {
+        this.start = start;
+    }
+
+    public Vector2D getEnd() {
+        return end;
+    }
+
+    public void setEnd(Vector2D end) {
+        this.end = end;
+    }
+
     @Override
     public String toString() {
         return "Arc{" +

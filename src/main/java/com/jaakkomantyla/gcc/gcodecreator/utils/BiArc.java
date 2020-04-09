@@ -100,6 +100,22 @@ public class BiArc {
         return arc1.length() + arc2.length();
     }
 
+    public Arc getArc1() {
+        return arc1;
+    }
+
+    public void setArc1(Arc arc1) {
+        this.arc1 = arc1;
+    }
+
+    public Arc getArc2() {
+        return arc2;
+    }
+
+    public void setArc2(Arc arc2) {
+        this.arc2 = arc2;
+    }
+
     @Override
     public String toString() {
         return "\nBiArc{" +
