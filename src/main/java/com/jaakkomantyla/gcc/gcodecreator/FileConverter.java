@@ -1,7 +1,12 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
+import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
+import com.jaakkomantyla.gcc.gcodecreator.utils.ToGCodeHandler;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.dom.util.SAXDocumentFactory;
+import org.apache.batik.parser.ParseException;
+import org.apache.batik.parser.PathHandler;
+import org.apache.batik.parser.PathParser;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.util.XMLResourceDescriptor;
@@ -19,7 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.function.Consumer;
 
-public class SVGHandler {
+public class FileConverter {
 
     public void test(){
         DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
@@ -78,14 +83,8 @@ public class SVGHandler {
     }
 
     public static byte[] prettyPrintXml(MultipartFile newFile) {
-
+        Document document = mPFileToDoc(newFile);
         try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setValidating(false);
-            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(newFile.getInputStream());
-
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -101,6 +100,11 @@ public class SVGHandler {
             return null;
         }
 
+    }
+
+    public static byte[] mPFileToGcode(MultipartFile newFile){
+        Document doc = mPFileToDoc(newFile);
+        return docToGcode(doc);
     }
 
     public static void printSvg(Node node){
@@ -128,5 +132,64 @@ public class SVGHandler {
         }
     }
 
+    public static Document mPFileToDoc(MultipartFile newFile) {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setValidating(false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(newFile.getInputStream());
+            return document;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Document fileToDoc(String path){
+        DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setValidating(false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            File x = new File(path);
+            System.out.println(x.getName());
+            Document doc = documentBuilder.parse(new File(path));
+            return doc;
+        }catch (Exception ex){
+                ex.printStackTrace();
+                return null;
+        }
+    }
+
+    public static byte[] docToGcode(Document doc){
+        Gcode gcode = new Gcode();
+        iterateSvg(doc, node -> {
+            if(node.getNodeName().equals("path")) {
+                if(node.hasAttributes()){
+                    NamedNodeMap map = node.getAttributes();
+                    System.out.println(map.getNamedItem("d").getNodeValue());
+                    pathDataToGcode(map.getNamedItem("d").getNodeValue(), gcode);
+                }
+            }
+        });
+
+        return gcode.commandsAsByteArray();
+    }
+
+    public static void pathDataToGcode(String s, Gcode gcode) throws ParseException {
+
+        PathParser pp = new PathParser();
+        PathHandler ph = new ToGCodeHandler(gcode);
+        pp.setPathHandler(ph);
+        pp.parse(s);
+        //System.out.println(gcode.commandsAsString());
+    }
+
+    public static String changeFileEnding(MultipartFile file, String ending){
+        String str = file.getOriginalFilename().split("\\.")[0];
+        return str+ending;
+    }
 
 }

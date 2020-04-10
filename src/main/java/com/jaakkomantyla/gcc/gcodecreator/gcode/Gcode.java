@@ -72,7 +72,32 @@ public class Gcode {
 
     public void printCommands(){
         commands.forEach(command -> {
-            System.out.println(command+"\n");
+            System.out.println(command);
         });
+    }
+
+    public String commandsAsString(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        commands.forEach(command -> {
+            stringBuilder.append(command.toString()+"\n");
+        });
+        return stringBuilder.toString();
+    }
+
+    public byte[] commandsAsByteArray(){
+        String str = commandsAsString();
+        return str.getBytes();
+    }
+
+    @Override
+    public String toString() {
+        return "Gcode{" +
+                "commands=" + commands +
+                ", currentCommand=" + currentCommand +
+                ", currentX=" + currentX +
+                ", currentY=" + currentY +
+                ", currentZ=" + currentZ +
+                '}';
     }
 }

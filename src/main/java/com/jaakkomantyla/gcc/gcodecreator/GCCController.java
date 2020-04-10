@@ -8,20 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -34,15 +22,15 @@ public class GCCController {
     public ResponseEntity uploadFile(@RequestParam MultipartFile file) {
         logger.info(String.format("File name '%s' uploaded successfully.", file.getOriginalFilename()));
 
-        byte[] svgAsByteArr = SVGHandler.prettyPrintXml(file);
-        ByteArrayInputStream bais = new ByteArrayInputStream(svgAsByteArr);
-        int length = svgAsByteArr.length;
-
+        byte[] gCodeBytes = FileConverter.mPFileToGcode(file);
+        ByteArrayInputStream bais = new ByteArrayInputStream(gCodeBytes);
+        int length = gCodeBytes.length;
+        String fileName = FileConverter.changeFileEnding(file, ".gcode");
 
         InputStreamResource resource = new InputStreamResource(bais);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getOriginalFilename())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
                 .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(length)

@@ -20,9 +20,7 @@ import org.w3c.dom.NamedNodeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.geom.Point2D;
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 @SpringBootTest
@@ -79,8 +77,8 @@ class GcodeCreatorApplicationTests {
 			System.out.println(doc.toString());
 			//System.out.println(doc.getDoctype().toString());
 			System.out.println(doc.getNodeName());
-			//SVGHandler.printSvg(doc);
-			SVGHandler.iterateSvg(doc, node -> {
+			//FileConverter.printSvg(doc);
+			FileConverter.iterateSvg(doc, node -> {
 				if(node.getNodeName().equals("path")) {
 					if(node.hasAttributes()){
 						NamedNodeMap map = node.getAttributes();
@@ -118,7 +116,7 @@ class GcodeCreatorApplicationTests {
 		PathHandler ph = new ToGCodeHandler(gcode);
 		pp.setPathHandler(ph);
 		pp.parse(s);
-		gcode.printCommands();
+		System.out.println(gcode.commandsAsString());
 	}
 
 }
