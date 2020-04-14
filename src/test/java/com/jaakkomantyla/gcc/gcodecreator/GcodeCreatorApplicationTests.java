@@ -1,5 +1,6 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
+import com.jaakkomantyla.gcc.gcodecreator.gcode.DocParser;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
 import com.jaakkomantyla.gcc.gcodecreator.utils.BezierToArcs;
 import com.jaakkomantyla.gcc.gcodecreator.utils.BiArc;
@@ -78,23 +79,7 @@ class GcodeCreatorApplicationTests {
 			//System.out.println(doc.getDoctype().toString());
 			System.out.println(doc.getNodeName());
 			//FileConverter.printSvg(doc);
-			FileConverter.iterateSvg(doc, node -> {
-				if(node.getNodeName().equals("path")) {
-					if(node.hasAttributes()){
-						NamedNodeMap map = node.getAttributes();
-						System.out.println(map.getNamedItem("d").getNodeValue());
-						pathDataToGcode(map.getNamedItem("d").getNodeValue());
-						/*for(int i =0; i< map.getLength(); i++){
-
-							System.out.println(map.item(i));
-						}
-
-						 */
-					}
-
-
-				}
-			});
+			DocParser.docToGcode(doc,"test").printCommands();
 
 
 

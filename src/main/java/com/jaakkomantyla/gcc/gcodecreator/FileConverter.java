@@ -1,6 +1,7 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
+import com.jaakkomantyla.gcc.gcodecreator.gcode.Options;
 import com.jaakkomantyla.gcc.gcodecreator.utils.ToGCodeHandler;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.dom.util.SAXDocumentFactory;
@@ -102,9 +103,9 @@ public class FileConverter {
 
     }
 
-    public static byte[] mPFileToGcode(MultipartFile newFile){
+    public static byte[] mPFileToGcode(MultipartFile newFile, Options options){
         Document doc = mPFileToDoc(newFile);
-        return docToGcode(doc);
+        return docToGcode(doc, options);
     }
 
     public static void printSvg(Node node){
@@ -165,6 +166,21 @@ public class FileConverter {
 
     public static byte[] docToGcode(Document doc){
         Gcode gcode = new Gcode();
+        iterateSvg(doc, node -> {
+            if(node.getNodeName().equals("path")) {
+                if(node.hasAttributes()){
+                    NamedNodeMap map = node.getAttributes();
+                    System.out.println(map.getNamedItem("d").getNodeValue());
+                    pathDataToGcode(map.getNamedItem("d").getNodeValue(), gcode);
+                }
+            }
+        });
+
+        return gcode.commandsAsByteArray();
+    }
+
+    public static byte[] docToGcode(Document doc, Options options){
+        Gcode gcode = new Gcode(options);
         iterateSvg(doc, node -> {
             if(node.getNodeName().equals("path")) {
                 if(node.hasAttributes()){

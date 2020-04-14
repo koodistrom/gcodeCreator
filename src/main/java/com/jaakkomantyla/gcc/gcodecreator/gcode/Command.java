@@ -7,14 +7,17 @@ public class  Command {
     private Float z;
     private Float i;
     private Float j;
+    private Float f;
+    private String comment;
 
-    public Command(Code code, Float x, Float y, Float z, Float i, Float j) {
+    public Command(Code code, Float x, Float y, Float z, Float i, Float j, Float f) {
         this.code = code;
         this.x = x;
         this.y = y;
         this.z = z;
         this.i = i;
         this.j = j;
+        this.f = f;
     }
 
     public Command(Code code, Float x, Float y, Float i, Float j) {
@@ -38,6 +41,14 @@ public class  Command {
         this.y = y;
     }
 
+    public Command(Code code, Float f) {
+        this.code = code;
+        this.f = f;
+    }
+
+    public Command(String comment){
+        this.comment = comment;
+    }
 
 
 
@@ -94,14 +105,25 @@ public class  Command {
         this.j = j;
     }
 
+    public Float getF() { return f; }
+
+    public void setF(Float f) { this.f = f; }
+
     @Override
     public String toString() {
-        String str = code + " ";
-        if(x!=null){str+="X"+x+" ";}
-        if(y!=null){str+="Y"+y+" ";}
-        if(z!=null){str+="Z"+z+" ";}
-        if(i!=null){str+="I"+i+" ";}
-        if(j!=null){str+="J"+j+" ";}
+        String str;
+        if(code != null){
+            str = code + " ";
+            if(x!=null){str+="X"+x+" ";}
+            if(y!=null){str+="Y"+y+" ";}
+            if(z!=null){str+="Z"+z+" ";}
+            if(i!=null){str+="I"+i+" ";}
+            if(j!=null){str+="J"+j+" ";}
+            if(f!=null){str+="F"+f+" ";}
+        }else{
+            str = "("+comment+")";
+        }
+
         return str;
     }
 }

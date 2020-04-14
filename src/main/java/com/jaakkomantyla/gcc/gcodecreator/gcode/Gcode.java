@@ -9,12 +9,36 @@ public class Gcode {
     private float currentX;
     private float currentY;
     private float currentZ;
+    private float currentF;
+    private float zMoveHeight;
+    private float zWorkHeight;
 
     public Gcode(){
         commands = new LinkedList<Command>();
+        commands.add(new Command("This file was generated with Gcode Generator"));
         currentX = 0;
         currentY =0;
         currentZ = 0;
+        zMoveHeight = 2;
+        zWorkHeight = 0;
+
+    }
+
+    public Gcode(Options options){
+        commands = new LinkedList<Command>();
+        commands.add(new Command("This file was generated with Gcode Generator"));
+        currentX = 0;
+        currentY =0;
+        currentZ = 0;
+        zMoveHeight = options.getMoveDepth();
+        zWorkHeight = options.getWorkDepth();
+        if(options.getUnits().equals("mm")){
+            commands.add(new Command(Code.G20));
+        }else{
+            commands.add(new Command(Code.G21));
+        }
+        addCommand(new Command(Code.G01, options.getFeed()));
+
     }
 
     public void addCommand(Command command ){
@@ -27,6 +51,9 @@ public class Gcode {
         }
         if(command.getZ()!=null){
             setCurrentZ(command.getZ());
+        }
+        if(command.getF()!=null){
+            setCurrentF(command.getF());
         }
     }
 
@@ -68,6 +95,30 @@ public class Gcode {
 
     public void setCurrentZ(float currentZ) {
         this.currentZ = currentZ;
+    }
+
+    public float getzMoveHeight() {
+        return zMoveHeight;
+    }
+
+    public void setzMoveHeight(float zMoveHeight) {
+        this.zMoveHeight = zMoveHeight;
+    }
+
+    public float getzWorkHeight() {
+        return zWorkHeight;
+    }
+
+    public void setzWorkHeight(float zWorkHeight) {
+        this.zWorkHeight = zWorkHeight;
+    }
+
+    public float getCurrentF() {
+        return currentF;
+    }
+
+    public void setCurrentF(float currentF) {
+        this.currentF = currentF;
     }
 
     public void printCommands(){

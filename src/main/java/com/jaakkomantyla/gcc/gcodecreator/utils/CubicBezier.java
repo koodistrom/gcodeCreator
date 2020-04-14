@@ -29,8 +29,8 @@ public class CubicBezier {
     {
         this.p1 = point1;
         this.c1 = controlPoint1;
-        this.p2 = point2;
         this.c2 = controlPoint2;
+        this.p2 = point2;
     }
 
     /// <summary>
@@ -116,6 +116,16 @@ public class CubicBezier {
         list.add(t1);
         list.add(t2);
         return list;
+    }
+
+    public static CubicBezier fromQuadratic(Vector2D point1, Vector2D control, Vector2D point2){
+        Vector2D p1 = point1;
+        Vector2D p2 = point2;
+
+        Vector2D c1 = point1.add((control.subtract(point1).scalarMultiply( 2/3 )));
+        Vector2D c2 = point2.add( (control.subtract(point2).scalarMultiply(2/3 )));
+        CubicBezier cb = new CubicBezier(p1, c1,c2,p2);
+        return cb;
     }
 
     public Vector2D getP1() {

@@ -1,5 +1,6 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
+import com.jaakkomantyla.gcc.gcodecreator.gcode.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -19,10 +20,10 @@ public class GCCController {
     private static final Logger logger = LoggerFactory.getLogger(GCCController.class);
 
     @PostMapping(value = "/uploadSVG", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity uploadFile(@RequestParam MultipartFile file) {
+    public ResponseEntity uploadFile(@RequestPart("file")  MultipartFile file,  @RequestPart("options")  Options options) {
         logger.info(String.format("File name '%s' uploaded successfully.", file.getOriginalFilename()));
 
-        byte[] gCodeBytes = FileConverter.mPFileToGcode(file);
+        byte[] gCodeBytes = FileConverter.mPFileToGcode(file, options);
         ByteArrayInputStream bais = new ByteArrayInputStream(gCodeBytes);
         int length = gCodeBytes.length;
         String fileName = FileConverter.changeFileEnding(file, ".gcode");
