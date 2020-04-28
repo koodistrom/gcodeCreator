@@ -1,5 +1,6 @@
 package com.jaakkomantyla.gcc.gcodecreator;
 
+import com.jaakkomantyla.gcc.gcodecreator.gcode.DocParser;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Options;
 import com.jaakkomantyla.gcc.gcodecreator.utils.ToGCodeHandler;
@@ -104,8 +105,10 @@ public class FileConverter {
     }
 
     public static byte[] mPFileToGcode(MultipartFile newFile, Options options){
+        String fileName = newFile.getOriginalFilename();
         Document doc = mPFileToDoc(newFile);
-        return docToGcode(doc, options);
+        Gcode g = DocParser.docToGcode(doc, fileName, options);
+        return g.commandsAsByteArray();
     }
 
     public static void printSvg(Node node){
@@ -123,15 +126,6 @@ public class FileConverter {
         }
     }
 
-    public static void iterateSvg(Document document, Consumer<Node> doThings){
-        NodeList nodeList = document.getElementsByTagName("*");
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                doThings.accept(node);
-            }
-        }
-    }
 
     public static Document mPFileToDoc(MultipartFile newFile) {
         try {
@@ -164,44 +158,7 @@ public class FileConverter {
         }
     }
 
-    public static byte[] docToGcode(Document doc){
-        Gcode gcode = new Gcode();
-        iterateSvg(doc, node -> {
-            if(node.getNodeName().equals("path")) {
-                if(node.hasAttributes()){
-                    NamedNodeMap map = node.getAttributes();
-                    System.out.println(map.getNamedItem("d").getNodeValue());
-                    pathDataToGcode(map.getNamedItem("d").getNodeValue(), gcode);
-                }
-            }
-        });
 
-        return gcode.commandsAsByteArray();
-    }
-
-    public static byte[] docToGcode(Document doc, Options options){
-        Gcode gcode = new Gcode(options);
-        iterateSvg(doc, node -> {
-            if(node.getNodeName().equals("path")) {
-                if(node.hasAttributes()){
-                    NamedNodeMap map = node.getAttributes();
-                    System.out.println(map.getNamedItem("d").getNodeValue());
-                    pathDataToGcode(map.getNamedItem("d").getNodeValue(), gcode);
-                }
-            }
-        });
-
-        return gcode.commandsAsByteArray();
-    }
-
-    public static void pathDataToGcode(String s, Gcode gcode) throws ParseException {
-
-        PathParser pp = new PathParser();
-        PathHandler ph = new ToGCodeHandler(gcode);
-        pp.setPathHandler(ph);
-        pp.parse(s);
-        //System.out.println(gcode.commandsAsString());
-    }
 
     public static String changeFileEnding(MultipartFile file, String ending){
         String str = file.getOriginalFilename().split("\\.")[0];

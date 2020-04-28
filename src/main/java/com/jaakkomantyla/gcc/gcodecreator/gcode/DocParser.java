@@ -11,11 +11,21 @@ import org.w3c.dom.NodeList;
 
 import java.util.function.Consumer;
 
+/**
+ * The DocParser class holds methods for parsing SVG files as org.w3c.dom.Document objects to my custom Gcode objects.
+ */
 public class DocParser {
 
 
-    public static Gcode docToGcode(Document doc, String filename){
-        Gcode gcode = new Gcode();
+    /**
+     * Doc to gcode.
+     *
+     * @param doc      the svg as a Document object
+     * @param filename the filename to be given to the gcode file
+     * @return the gcode
+     */
+    public static Gcode docToGcode(Document doc, String filename,  Options options){
+        Gcode gcode = new Gcode(options);
         gcode.addCommand(new Command("Generated from: "+filename));
         iterateSvg(doc, node -> {
             if(node.getNodeName().equals("path")) {
@@ -26,6 +36,13 @@ public class DocParser {
         return gcode;
     }
 
+    /**
+     * Path to gcode is used by docToGcode() method to parse svg path to gcode commands.
+     *
+     * @param node  the svg path node from Document
+     * @param gcode the gcode object to which the commands are added
+     * @throws ParseException the parse exception
+     */
     public static void pathToGcode(Node node, Gcode gcode) throws ParseException {
 
         NamedNodeMap map = node.getAttributes();
@@ -42,6 +59,12 @@ public class DocParser {
 
     }
 
+    /**
+     * Iterates Document. Used by docToGcode() method to iterate svg.
+     *
+     * @param document the document to iterate
+     * @param doThings the Consumer that holds operations to do to the node
+     */
     public static void iterateSvg(Document document, Consumer<Node> doThings){
         NodeList nodeList = document.getElementsByTagName("*");
         for (int i = 0; i < nodeList.getLength(); i++) {
