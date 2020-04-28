@@ -22,10 +22,30 @@ public class DocParser {
      *
      * @param doc      the svg as a Document object
      * @param filename the filename to be given to the gcode file
+     * @param options the user given options for creating the gcode
      * @return the gcode
      */
     public static Gcode docToGcode(Document doc, String filename,  Options options){
         Gcode gcode = new Gcode(options);
+        gcode.addCommand(new Command("Generated from: "+filename));
+        iterateSvg(doc, node -> {
+            if(node.getNodeName().equals("path")) {
+                pathToGcode(node, gcode);
+            }
+        });
+
+        return gcode;
+    }
+
+    /**
+     * Doc to gcode.
+     *
+     * @param doc      the svg as a Document object
+     * @param filename the filename to be given to the gcode file
+     * @return the gcode
+     */
+    public static Gcode docToGcode(Document doc, String filename){
+        Gcode gcode = new Gcode();
         gcode.addCommand(new Command("Generated from: "+filename));
         iterateSvg(doc, node -> {
             if(node.getNodeName().equals("path")) {
