@@ -5,19 +5,29 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * The class represents two arcs that approximate bezier curve and is used in converting Bezier curves used in svg
+ * format to simple arcs used in gcode.
+ * The utils for converting Bezier curves to arcs are made with help of this very informative blog-post:
+ * http://dlacko.org/blog/2016/10/19/approximating-bezier-curves-by-biarcs/
+ * And this Github repo written in c#:
+ * https://github.com/domoszlai/bezier2biarc
+ */
 public class BiArc {
 
     private Arc arc1;
     private Arc arc2;
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="p1">Start point</param>
-    /// <param name="t1">Tangent vector at p1</param>
-    /// <param name="p2">End point</param>
-    /// <param name="t2">Tangent vector at p2</param>
-    /// <param name="trans">Transition point</param>
+    /**
+     * Instantiates a new Bi arc.
+     *
+     * @param p1    the start point
+     * @param t1    the tangent vector at start point
+     * @param p2    the end point
+     * @param t2    the tangent vector at end point
+     * @param trans the transition point between the two arcs
+     */
+
     public BiArc(Vector2D p1, Vector2D t1, Vector2D p2, Vector2D t2, Vector2D trans)
     {
         // Calculate the orientation
@@ -77,11 +87,14 @@ public class BiArc {
         arc2 = new Arc(c2, r2, (float)startAngle2, (float)sweepAngle2, trans, p2);
     }
 
-    /// <summary>
-    /// Implement the parametric equation.
-    /// </summary>
-    /// <param name="t">Parameter of the curve. Must be in [0,1]</param>
-    /// <returns></returns>
+    /**
+     * Returns a point on the biArc at t when t is in [0,1] and represents relative distance from the start.
+     * eg. t=0.5 returns a point on the middle of the arc
+     *
+     * @param t the relative distance from start of the curve. Must be in [0,1]
+     * @return the point on arc as Vector2D
+     */
+
     public Vector2D pointAt(float t)
     {
         float s = arc1.length() / (arc1.length() + arc2.length());
@@ -96,22 +109,47 @@ public class BiArc {
         }
     }
 
+    /**
+     * Length float.
+     *
+     * @return the length of the biArc
+     */
     public float length(){
         return arc1.length() + arc2.length();
     }
 
+    /**
+     * Gets arc 1.
+     *
+     * @return the arc 1
+     */
     public Arc getArc1() {
         return arc1;
     }
 
+    /**
+     * Sets arc 1.
+     *
+     * @param arc1 the arc 1
+     */
     public void setArc1(Arc arc1) {
         this.arc1 = arc1;
     }
 
+    /**
+     * Gets arc 2.
+     *
+     * @return the arc 2
+     */
     public Arc getArc2() {
         return arc2;
     }
 
+    /**
+     * Sets arc 2.
+     *
+     * @param arc2 the arc 2
+     */
     public void setArc2(Arc arc2) {
         this.arc2 = arc2;
     }

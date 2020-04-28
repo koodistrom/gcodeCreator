@@ -3,15 +3,7 @@ package com.jaakkomantyla.gcc.gcodecreator;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.DocParser;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Options;
-import com.jaakkomantyla.gcc.gcodecreator.utils.ToGCodeHandler;
 import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.dom.util.SAXDocumentFactory;
-import org.apache.batik.parser.ParseException;
-import org.apache.batik.parser.PathHandler;
-import org.apache.batik.parser.PathParser;
-import org.apache.batik.svggen.SVGGeneratorContext;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.util.XMLResourceDescriptor;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.*;
 
@@ -24,68 +16,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.function.Consumer;
 
+/**
+ * The File converter class has methods that take MultipartFile objects received from front end and returns
+ * the wanted outputs as byte arrays that can be send back to the front end.
+ */
 public class FileConverter {
 
-    public void test(){
-        DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
-        try {
-            String parser = XMLResourceDescriptor.getXMLParserClassName();
-            SAXDocumentFactory f = new SAXDocumentFactory( impl, parser);
 
-            String uri = "http://www.w3.org/2000/svg";
-            Document doc = f.createDocument(uri);
-            System.out.print(doc.toString());
-
-            SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(doc);
-
-            SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
-
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-
-    }
-
-
-    public static void parse(){
-        DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
-        try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setValidating(false);
-            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            String path = "C:/Users/Jaakko/Desktop/koulujutut/dynaaminen/GcodeCreator/testFiles/artrobot.svg";
-            File x = new File(path);
-            System.out.println(x.getName());
-            Document doc = documentBuilder.parse(new File(path));
-
-
-
-
-            System.out.println(doc.toString());
-            //System.out.println(doc.getDoctype().toString());
-            System.out.println(doc.getNodeName());
-            printSvg(doc);
-
-
-
-
-
-            SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(doc);
-
-            SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
-
-
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-
-    }
-
-    public static byte[] prettyPrintXml(MultipartFile newFile) {
-        Document document = mPFileToDoc(newFile);
+    /**
+     * Pretty print xml byte [ ] takes xml file as MultipartFile object and reformats it. Each node
+     * is printed to their own line and indented properly.
+     *
+     * @param file the file to prettify
+     * @return the reformated file as byte array
+     */
+    public static byte[] prettyPrintXml(MultipartFile file) {
+        Document document = mPFileToDoc(file);
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -104,14 +51,26 @@ public class FileConverter {
 
     }
 
-    public static byte[] mPFileToGcode(MultipartFile newFile, Options options){
-        String fileName = newFile.getOriginalFilename();
-        Document doc = mPFileToDoc(newFile);
+    /**
+     * Converts svg presented as MultipartFile object to gcode.
+     *
+     * @param file the svg file to convert
+     * @param options the user given options
+     * @return the gcode as byte array
+     */
+    public static byte[] mPFileToGcode(MultipartFile file, Options options){
+        String fileName = file.getOriginalFilename();
+        Document doc = mPFileToDoc(file);
         Gcode g = DocParser.docToGcode(doc, fileName, options);
         return g.commandsAsByteArray();
     }
 
-    public static void printSvg(Node node){
+    /**
+     * Used in testing prints a node and all its child nodes.
+     *
+     * @param node the node
+     */
+    public static void printNode(Node node){
         System.out.println(node);
         if(node.hasAttributes()){
             NamedNodeMap map = node.getAttributes();
@@ -122,18 +81,24 @@ public class FileConverter {
 
         NodeList l =  node.getChildNodes();
         for(int i =0; i< l.getLength(); i++){
-            printSvg(l.item(i));
+            printNode(l.item(i));
         }
     }
 
 
-    public static Document mPFileToDoc(MultipartFile newFile) {
+    /**
+     * Converts xml file presented as MultipartFile object to Document.
+     *
+     * @param file the file to convert
+     * @return the document
+     */
+    public static Document mPFileToDoc(MultipartFile file) {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setValidating(false);
             documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(newFile.getInputStream());
+            Document document = documentBuilder.parse(file.getInputStream());
             return document;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -141,6 +106,12 @@ public class FileConverter {
         }
     }
 
+    /**
+     * Converts xml file from given path to Document.
+     *
+     * @param path the path
+     * @return the document
+     */
     public static Document fileToDoc(String path){
         DOMImplementation impl = GenericDOMImplementation.getDOMImplementation();
         try {
@@ -159,7 +130,13 @@ public class FileConverter {
     }
 
 
-
+    /**
+     * Gets the name from MultipartFile and changes the ending to user given one
+     *
+     * @param file   the file
+     * @param ending the new ending
+     * @return the name with new ending
+     */
     public static String changeFileEnding(MultipartFile file, String ending){
         String str = file.getOriginalFilename().split("\\.")[0];
         return str+ending;

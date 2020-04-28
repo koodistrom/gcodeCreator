@@ -6,7 +6,16 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-// http://dlacko.org/blog/2016/10/19/approximating-bezier-curves-by-biarcs/
+
+/**
+ * The class converts Bezier curves to list of BiArcs and is used in converting Bezier curves used in svg format to
+ * simple arcs used in gcode.
+ * The utils for converting Bezier curves to arcs are made with help of this very informative blog-post:
+ * http://dlacko.org/blog/2016/10/19/approximating-bezier-curves-by-biarcs/
+ * And this Github repo written in c#:
+ * https://github.com/domoszlai/bezier2biarc
+ */
+
 public class BezierToArcs {
 
 
@@ -15,6 +24,15 @@ public class BezierToArcs {
         return t.getImaginary() == 0 && t.getReal() > 0 && t.getReal() < 1;
     }
 
+    /**
+     * Approximates cubic bezier to BiArcs (pair of Arcs see BiArc class) and returns them in a list.
+     *
+     * @param bezier       the bezier to convert
+     * @param samplingStep the sampling step the distance of samples checked by the program that the arc approximation
+     *                     is within the tolerance
+     * @param tolerance    the tolerance for the approximation used in the conversion
+     * @return the list of BiArcs
+     */
     public static List<BiArc> ApproxCubicBezier(CubicBezier bezier, float samplingStep, float tolerance)
     {
         // The result will be put here

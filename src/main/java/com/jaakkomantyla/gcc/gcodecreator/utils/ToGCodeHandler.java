@@ -8,6 +8,12 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import java.util.List;
 
+/**
+ * ToGCodeHandler extends Apache's Batik Parser's DefaultPathHandler and is used when iterating over svg file.
+ * The class holds methods to handle information of the path elements in svgs. Class uses the utils classes that
+ * converts Bezier curves to arcs to convert svg data to suitable format for gcode. Then it creates Commands
+ * and adds them to Gcode object.
+ */
 public class ToGCodeHandler extends DefaultPathHandler {
     private Gcode gCode;
     private float curveAprTolerance;
@@ -15,6 +21,11 @@ public class ToGCodeHandler extends DefaultPathHandler {
     private float pathStartX;
     private float pathStartY;
 
+    /**
+     * Instantiates a new  ToGCodeHandler.
+     *
+     * @param gCode the Gcode object to add the generated commands in.
+     */
     public ToGCodeHandler(Gcode gCode) {
         super();
         this.gCode = gCode;
@@ -22,24 +33,25 @@ public class ToGCodeHandler extends DefaultPathHandler {
         curveSamplingStep = 10;
 
     }
-
+    @Override
     public void startPath(){
         pathStartX = gCode.getCurrentX();
         pathStartY = gCode.getCurrentY();
     }
-
+    @Override
     public void arcAbs(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
 
     }
-
+    @Override
     public void arcRel(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
 
     }
-
+    @Override
     public void closePath() {
         gCode.addCommand(new Command(Code.G01, pathStartX, pathStartY));
     }
 
+    @Override
     public void curvetoCubicRel(float x1, float y1, float x2, float y2, float x, float y){
         System.out.println("hadler method called");
         float curX = gCode.getCurrentX();
@@ -52,6 +64,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
 
     }
 
+    @Override
     public void curvetoCubicAbs(float x1, float y1, float x2, float y2, float x, float y) {
 
         Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
@@ -63,14 +76,17 @@ public class ToGCodeHandler extends DefaultPathHandler {
 
     };
 
+    @Override
     public void curvetoCubicSmoothAbs(float x2, float y2, float x, float y){
 
     }
 
+    @Override
     public void 	curvetoCubicSmoothRel(float x2, float y2, float x, float y){
 
     }
 
+    @Override
     public void 	curvetoQuadraticAbs(float x1, float y1, float x, float y){
         Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
         Vector2D c1 = new Vector2D(x1,y1);
@@ -80,6 +96,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
         addBezierToGcode(cb);
     }
 
+    @Override
     public void 	curvetoQuadraticRel(float x1, float y1, float x, float y){
         System.out.println("hadler method called");
         float curX = gCode.getCurrentX();
@@ -92,33 +109,41 @@ public class ToGCodeHandler extends DefaultPathHandler {
         addBezierToGcode(cb);
     }
 
+    @Override
     public void 	curvetoQuadraticSmoothAbs(float x, float y){
 
     }
 
+    @Override
     public void 	curvetoQuadraticSmoothRel(float x, float y){
 
     }
 
+    @Override
     public void 	linetoAbs(float x, float y){
         gCode.addCommand(new Command(Code.G01, x, y));
     }
+    @Override
     public void 	linetoHorizontalAbs(float x){
         gCode.addCommand(new Command(Code.G01, x, gCode.getCurrentY()));
     }
+    @Override
     public void 	linetoHorizontalRel(float x){
         gCode.addCommand(new Command(Code.G01, x + gCode.getCurrentX(), gCode.getCurrentY()));
     }
+    @Override
     public void 	linetoRel(float x, float y){
         gCode.addCommand(new Command(Code.G01, x + gCode.getCurrentX(), y+gCode.getCurrentY()));
     }
+    @Override
     public void 	linetoVerticalAbs(float y){
         gCode.addCommand(new Command(Code.G01, gCode.getCurrentX(), y));
     }
+    @Override
     public void 	linetoVerticalRel(float y){
         gCode.addCommand(new Command(Code.G01, gCode.getCurrentX(), y+gCode.getCurrentY()));
     }
-
+    @Override
     public void movetoAbs(float x, float y){
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzMoveHeight()));
         gCode.addCommand(new Command(Code.G00, x, y));
@@ -126,13 +151,14 @@ public class ToGCodeHandler extends DefaultPathHandler {
         pathStartX = gCode.getCurrentX();
         pathStartY = gCode.getCurrentY();
     };
-
+    @Override
     public void movetoRel(float x, float y){
 
         gCode.addCommand(new Command(Code.G00, x+gCode.getCurrentX(), y+gCode.getCurrentY()));
         pathStartX = gCode.getCurrentX();
         pathStartY = gCode.getCurrentY();
     }
+    @Override
     public void endPath(){
 
     };

@@ -7,6 +7,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The class represents a cubic Bezier curve and is used in converting Bezier curves used in svg format to simple arcs
+ * used in gcode.
+ * The utils for converting Bezier curves to arcs are made with help of this very informative blog-post:
+ * http://dlacko.org/blog/2016/10/19/approximating-bezier-curves-by-biarcs/
+ * And this Github repo written in c#:
+ * https://github.com/domoszlai/bezier2biarc
+ */
 public class CubicBezier {
     /// <summary>
     /// Start point
@@ -25,6 +33,14 @@ public class CubicBezier {
     /// </summary>
     private Vector2D c2;
 
+    /**
+     * Instantiates a new Cubic bezier.
+     *
+     * @param point1        the start point
+     * @param controlPoint1 the control point 1
+     * @param controlPoint2 the control point 2
+     * @param point2        the end point
+     */
     public CubicBezier(Vector2D point1, Vector2D controlPoint1, Vector2D controlPoint2, Vector2D point2)
     {
         this.p1 = point1;
@@ -33,11 +49,14 @@ public class CubicBezier {
         this.p2 = point2;
     }
 
-    /// <summary>
-    /// Implement the parametric equation.
-    /// </summary>
-    /// <param name="t">Parameter of the curve. Must be in [0,1]</param>
-    /// <returns></returns>
+    /**
+     * Returns a point on the curve at t. When t is in [0,1] and represents distance from the start.
+     * eg. t=0.5 returns a point on the middle of the curve.
+     *
+     * @param t the relative distance from start of the curve. Must be in [0,1]
+     * @return the point on arc as Vector2D
+     */
+
     public Vector2D pointAt(float t)
     {
         Vector2D point =p1.scalarMultiply((float)Math.pow(1 - t, 3)).add(
@@ -50,11 +69,14 @@ public class CubicBezier {
         return point;
     }
 
-    /// <summary>
-    /// Split a bezier curve at a given parameter value. It returns both of the new ones
-    /// </summary>
-    /// <param name="t">Parameter of the curve. Must be in [0,1]</param>
-    /// <returns></returns>
+    /**
+     * Splits curve on the point t. When t is in [0,1] and represents distance from the start.
+     * eg. t=0.5 splits the curve at the middle.
+     *
+     * @param t the t
+     * @return a list containing the two new CubicBeziers
+     */
+
     public List<CubicBezier> split(float t)
     {
         Vector2D start = p1;
@@ -79,9 +101,11 @@ public class CubicBezier {
         return pointBefore.add((pointAfter.subtract(pointBefore).scalarMultiply(scalar)));
     }
 
-    /// <summary>
-    /// The orientation of the Bezier curve
-    /// </summary>
+    /**
+     * Is clockwise boolean. Indicates orientation of the curve; clockwise or counter clockwise
+     *
+     * @return the boolean
+     */
     public boolean IsClockwise()
     {
             float sum = 0;
@@ -93,13 +117,14 @@ public class CubicBezier {
 
     }
 
-    /// <summary>
-    /// Inflexion points of the Bezier curve. They only valid if they are real and in the range of [0,1]
-    /// </summary>
-    /// <param name="bezier"></param>
-    /// <returns></returns>
+    /**
+     * Calculates inflexion points of the curve and returns the as a list.
+     * The points are valid only if they are in the range of 0-1.
+     * http://www.caffeineowl.com/graphics/2d/vectorial/cubic-inflexion.html
+     * @return the inflection points in a list as Complexes
+     */
+
     public List<Complex> inflexionPoints() {
-            // http://www.caffeineowl.com/graphics/2d/vectorial/cubic-inflexion.html
 
         Vector2D A = c1.subtract(p1);
         Vector2D B = c2.subtract(c1.subtract(A));
@@ -118,6 +143,14 @@ public class CubicBezier {
         return list;
     }
 
+    /**
+     * Returns cubic Bezier from quadratic bezier curve.
+     *
+     * @param point1  the start point of quadratic bezier
+     * @param control the control point of quadratic bezier
+     * @param point2  the the end point  of quadratic bezier
+     * @return the cubic bezier
+     */
     public static CubicBezier fromQuadratic(Vector2D point1, Vector2D control, Vector2D point2){
         Vector2D p1 = point1;
         Vector2D p2 = point2;
@@ -128,34 +161,74 @@ public class CubicBezier {
         return cb;
     }
 
+    /**
+     * Gets p 1.
+     *
+     * @return the p 1
+     */
     public Vector2D getP1() {
         return p1;
     }
 
+    /**
+     * Sets p 1.
+     *
+     * @param p1 the p 1
+     */
     public void setP1(Vector2D p1) {
         this.p1 = p1;
     }
 
+    /**
+     * Gets p 2.
+     *
+     * @return the p 2
+     */
     public Vector2D getP2() {
         return p2;
     }
 
+    /**
+     * Sets p 2.
+     *
+     * @param p2 the p 2
+     */
     public void setP2(Vector2D p2) {
         this.p2 = p2;
     }
 
+    /**
+     * Gets c 1.
+     *
+     * @return the c 1
+     */
     public Vector2D getC1() {
         return c1;
     }
 
+    /**
+     * Sets c 1.
+     *
+     * @param c1 the c 1
+     */
     public void setC1(Vector2D c1) {
         this.c1 = c1;
     }
 
+    /**
+     * Gets c 2.
+     *
+     * @return the c 2
+     */
     public Vector2D getC2() {
         return c2;
     }
 
+    /**
+     * Sets c 2.
+     *
+     * @param c2 the c 2
+     */
     public void setC2(Vector2D c2) {
         this.c2 = c2;
     }

@@ -12,6 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 
+/**
+ * The Gcc controller handles requests from the Gcode Creators front end.
+ */
 @CrossOrigin("*")
 @RestController
 public class GCCController {
@@ -19,6 +22,13 @@ public class GCCController {
 
     private static final Logger logger = LoggerFactory.getLogger(GCCController.class);
 
+    /**
+     * Receives svg as MultipartFile from front end with user given options and returns the gcode created from them
+     *
+     * @param file    the svg file
+     * @param options the user given options
+     * @return the response entity containing gcode file and its filename
+     */
     @PostMapping(value = "/uploadSVG", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity uploadFile(@RequestPart("file")  MultipartFile file,  @RequestPart("options")  Options options) {
         logger.info(String.format("File name '%s' uploaded successfully.", file.getOriginalFilename()));

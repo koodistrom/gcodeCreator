@@ -2,43 +2,53 @@ package com.jaakkomantyla.gcc.gcodecreator.utils;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
+/**
+ * The class represents a line in point slope form and is used in converting Bezier curves used in svg format
+ * to simple arcs used in gcode.
+ * y - y1 = m * (x - x1)
+ * Vertical line: m = NaN
+ * Horizontal line: m = 0
+ * The utils for converting Bezier curves to arcs are made with help of this very informative blog-post:
+ * http://dlacko.org/blog/2016/10/19/approximating-bezier-curves-by-biarcs/
+ * And this Github repo written in c#:
+ * https://github.com/domoszlai/bezier2biarc
+ */
 public class Line {
-    /// <summary>
-    /// Defines a line in point-slope form: y - y1 = m * (x - x1)
-    /// Vertical line: m = NaN
-    /// Horizontal line: m = 0
-    /// </summary>
-
 
     private Float slope;
     private Vector2D point;
 
-        /// <summary>
-        /// Define a line by two points
-        /// </summary>
-        /// <param name="P1"></param>
-        /// <param name="P2"></param>
+    /**
+     * Instantiates a new Line that goes through the given points
+     *
+     * @param p1
+     * @param p2
+     */
         public Line(Vector2D p1, Vector2D p2) {
             this.point = p1;
             this.slope = calculateSlope(p1, p2);
         }
 
-        /// <summary>
-        /// Define a line by a point and slope
-        /// </summary>
-        /// <param name="P"></param>
-        /// <param name="m"></param>
+    /**
+     * Instantiates a new Line that goes through the given point and has the given slope.
+     *
+     * @param P     the point
+     * @param slope the slope
+     */
+
         public Line(Vector2D P, Float slope)
         {
             this.point = P;
             this.slope = slope;
         }
 
-        /// <summary>
-        /// Calculate the intersection point of this line and another one
-        /// </summary>
-        /// <param name="l"></param>
-        /// <returns></returns>
+    /**
+     * Calculates the intersection point of this line and the given line.
+     *
+     * @param l the line
+     * @return the intersection point as Vector2D
+     */
+
         public Vector2D Intersection(Line l)
         {
             if(slope.isNaN())
@@ -58,13 +68,7 @@ public class Line {
             }
         }
 
-        /// <summary>
-        /// Special case, the first one is vertical (we suppose that the other one is not,
-        /// otherwise they do not cross)
-        /// </summary>
-        /// <param name="hl"></param>
-        /// <param name="l"></param>
-        /// <returns></returns>
+        //checks for special cases on the intersection
         private static Vector2D verticalIntersection(Line vl, Line l)
         {
             double x = vl.getPoint().getX();
@@ -72,12 +76,15 @@ public class Line {
             return new Vector2D(x, y);
         }
 
-        /// <summary>
-        /// Creates a a line which is perpendicular to the line defined by p and p1 and goes through p
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="p1"></param>
-        /// <returns></returns>
+    /**
+     * Create perpendicular at line to the line defined by the points. The returned line
+     * goes through p.
+     *
+     * @param p
+     * @param p1
+     * @return the perpendicular line
+     */
+
         public static Line CreatePerpendicularAt(Vector2D p, Vector2D p1)
         {
             Float m = calculateSlope(p, p1);
@@ -108,18 +115,38 @@ public class Line {
             }
         }
 
+    /**
+     * Gets slope.
+     *
+     * @return the slope
+     */
     public Float getSlope() {
         return slope;
     }
 
+    /**
+     * Sets slope.
+     *
+     * @param slope the slope
+     */
     public void setSlope(Float slope) {
         this.slope = slope;
     }
 
+    /**
+     * Gets point.
+     *
+     * @return the point
+     */
     public Vector2D getPoint() {
         return point;
     }
 
+    /**
+     * Sets point.
+     *
+     * @param point the point
+     */
     public void setPoint(Vector2D point) {
         this.point = point;
     }
