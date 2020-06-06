@@ -45,9 +45,9 @@ public class Gcode {
         zMoveHeight = options.getMoveDepth();
         zWorkHeight = options.getWorkDepth();
         if(options.getUnits().equals("mm")){
-            commands.add(new Command(Code.G20));
-        }else{
             commands.add(new Command(Code.G21));
+        }else{
+            commands.add(new Command(Code.G20));
         }
         addCommand(new Command(Code.G01, options.getFeed()));
 
