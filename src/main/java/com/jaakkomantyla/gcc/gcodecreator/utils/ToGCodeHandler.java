@@ -154,9 +154,19 @@ public class ToGCodeHandler extends DefaultPathHandler {
     @Override
     public void movetoRel(float x, float y){
 
+        gCode.addCommand(new Command(Code.G00, null, null, gCode.getzMoveHeight()));
+        gCode.addCommand(new Command(Code.G00, x, y));
+        gCode.addCommand(new Command(Code.G00, null, null, gCode.getzWorkHeight()));
+        pathStartX = gCode.getCurrentX();
+        pathStartY = gCode.getCurrentY();
+        /*svg on paskaa jostain syystä ilmeisesti m relative toimii samoin kuin M absoluuttinen joten
+        kommentoin nämä pois ja kokeilen tuikata tuon absoluuttisen tähän
+
         gCode.addCommand(new Command(Code.G00, x+gCode.getCurrentX(), y+gCode.getCurrentY()));
         pathStartX = gCode.getCurrentX();
         pathStartY = gCode.getCurrentY();
+
+         */
     }
     @Override
     public void endPath(){
