@@ -32,5 +32,4 @@ public enum Code {
     /**
      * F code. feedrate
      */
-    F //feedrate
 }

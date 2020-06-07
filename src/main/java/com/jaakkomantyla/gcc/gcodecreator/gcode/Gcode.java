@@ -14,21 +14,25 @@ public class Gcode {
     private float currentY;
     private float currentZ;
     private float currentF;
-    private float zMoveHeight;
-    private float zWorkHeight;
+    private List<Command> header;
+    private List<Command> footer;
+    private Options options;
+    private final String fileInfo = "This file was generated with Gcode Generator";
 
     /**
      * Instantiates a new Gcode.
      */
     public Gcode(){
         commands = new LinkedList<Command>();
-        commands.add(new Command("This file was generated with Gcode Generator"));
+        header = new LinkedList<Command>();
+        footer = new LinkedList<Command>();
+        commands.add(new Command(fileInfo));
         currentX = 0;
         currentY =0;
         currentZ = 0;
-        zMoveHeight = 2;
-        zWorkHeight = 0;
-
+        options = new Options();
+        options.setWorkDepth(0);
+        options.setMoveDepth(2);
     }
 
     /**
@@ -38,19 +42,30 @@ public class Gcode {
      */
     public Gcode(Options options){
         commands = new LinkedList<Command>();
-        commands.add(new Command("This file was generated with Gcode Generator"));
+        header = new LinkedList<Command>();
+        footer = new LinkedList<Command>();
         currentX = 0;
         currentY =0;
         currentZ = 0;
-        zMoveHeight = options.getMoveDepth();
-        zWorkHeight = options.getWorkDepth();
-        if(options.getUnits().equals("mm")){
-            commands.add(new Command(Code.G21));
-        }else{
-            commands.add(new Command(Code.G20));
-        }
-        addCommand(new Command(Code.G01, options.getFeed()));
+        createDefaultHeader(options);
+        createDefaultFooter(options);
+    }
 
+    public void createDefaultHeader(Options options){
+        header.add(new Command("%"));
+        header.add(new Command(fileInfo));
+        if(options.getUnits().equals("mm")){
+            header.add(new Command(Code.G21));
+        }else{
+            header.add(new Command(Code.G20));
+        }
+
+    }
+
+    public void createDefaultFooter(Options options){
+        footer.add(new Command(Code.G00,currentX,currentY, getzMoveHeight()));
+        footer.add(new Command(Code.G00,0f,0f));
+        footer.add(new Command("%"));
     }
 
     /**
@@ -60,6 +75,10 @@ public class Gcode {
      * @param command the command to add
      */
     public void addCommand(Command command ){
+        Code code = command.getCode();
+        if(currentCommand.getCode() != code && (code == Code.G01 || code == Code.G02 || code == Code.G03)){
+            command.setF(options.getFeed());
+        }
         commands.add(command);
         if(command.getX()!=null){
             setCurrentX(command.getX());
@@ -73,6 +92,7 @@ public class Gcode {
         if(command.getF()!=null){
             setCurrentF(command.getF());
         }
+        setCurrentCommand(command);
     }
 
     /**
@@ -171,7 +191,7 @@ public class Gcode {
      * @return the move height
      */
     public float getzMoveHeight() {
-        return zMoveHeight;
+        return options.getMoveDepth();
     }
 
     /**
@@ -180,7 +200,7 @@ public class Gcode {
      * @param zMoveHeight the z move height
      */
     public void setzMoveHeight(float zMoveHeight) {
-        this.zMoveHeight = zMoveHeight;
+        this.options.setMoveDepth(zMoveHeight);
     }
 
     /**
@@ -189,7 +209,7 @@ public class Gcode {
      * @return the work height
      */
     public float getzWorkHeight() {
-        return zWorkHeight;
+        return options.getWorkDepth();
     }
 
     /**
@@ -198,7 +218,7 @@ public class Gcode {
      * @param zWorkHeight the z work height
      */
     public void setzWorkHeight(float zWorkHeight) {
-        this.zWorkHeight = zWorkHeight;
+        this.options.setWorkDepth(zWorkHeight);
     }
 
     /**
@@ -233,7 +253,7 @@ public class Gcode {
      *
      * @return the string
      */
-    public String commandsAsString(){
+    public String commandsAsString(List<Command> commands){
         StringBuilder stringBuilder = new StringBuilder();
 
         commands.forEach(command -> {
@@ -248,7 +268,9 @@ public class Gcode {
      * @return the byte [ ]
      */
     public byte[] commandsAsByteArray(){
-        String str = commandsAsString();
+        String str = commandsAsString(header);
+        str +=  commandsAsString(commands);
+        str +=  commandsAsString(footer);
         return str.getBytes();
     }
 

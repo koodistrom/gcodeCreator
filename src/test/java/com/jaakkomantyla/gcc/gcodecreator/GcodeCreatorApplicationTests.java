@@ -101,7 +101,7 @@ class GcodeCreatorApplicationTests {
 		PathHandler ph = new ToGCodeHandler(gcode);
 		pp.setPathHandler(ph);
 		pp.parse(s);
-		System.out.println(gcode.commandsAsString());
+		System.out.println(gcode.commandsAsString(gcode.getCommands()));
 	}
 
 }
