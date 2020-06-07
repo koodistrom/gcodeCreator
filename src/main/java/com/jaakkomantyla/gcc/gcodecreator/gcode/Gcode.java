@@ -44,6 +44,7 @@ public class Gcode {
         commands = new LinkedList<Command>();
         header = new LinkedList<Command>();
         footer = new LinkedList<Command>();
+        this.options = options;
         currentX = 0;
         currentY =0;
         currentZ = 0;
@@ -63,7 +64,9 @@ public class Gcode {
     }
 
     public void createDefaultFooter(Options options){
-        footer.add(new Command(Code.G00,currentX,currentY, getzMoveHeight()));
+        Command rise = new Command(Code.G00);
+        rise.setZ(getzMoveHeight());
+        footer.add(rise);
         footer.add(new Command(Code.G00,0f,0f));
         footer.add(new Command("%"));
     }
@@ -76,9 +79,12 @@ public class Gcode {
      */
     public void addCommand(Command command ){
         Code code = command.getCode();
-        if(currentCommand.getCode() != code && (code == Code.G01 || code == Code.G02 || code == Code.G03)){
-            command.setF(options.getFeed());
+        if(code == Code.G01 || code == Code.G02 || code == Code.G03){
+            if(currentCommand== null || currentCommand.getCode() == null  || currentCommand.getCode() != code){
+                command.setF(options.getFeed());
+            }
         }
+
         commands.add(command);
         if(command.getX()!=null){
             setCurrentX(command.getX());
