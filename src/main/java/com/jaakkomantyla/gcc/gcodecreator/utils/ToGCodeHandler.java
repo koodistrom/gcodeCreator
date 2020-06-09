@@ -174,7 +174,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
     };
 
     private void addArcToGcode(Arc arc){
-        Code code = arc.isClockwise() ? Code.G02 : Code.G03;
+        Code code = arc.isClockwise() ? Code.G03 : Code.G02;
         float x =  (float) arc.getEnd().getX();
         float y = (float) arc.getEnd().getY();
         float i = (float) arc.getCenter().getX()-gCode.getCurrentX();
