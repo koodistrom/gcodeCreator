@@ -48,10 +48,11 @@ public class EllipticalArc {
         // as derived from http://spencermortensen.com/articles/bezier-circle
         System.out.println("ang2 = "+ang2);
         double a;
-
-        if(ang2 == 1.5707961751138155){
+        double quarterTurn =  1.5707961751138155;
+        double quarterTurn2 =  0.7853983718506589;
+        if(ang2 == -1){
             a =  0.551915024494;
-        }else if(ang2 == -1.5707961751138155){
+        }else if(ang2 == -1){
             a =  -0.551915024494;
         }else{
             a=4 / 3 * Math.tan(ang2 / 4);
@@ -204,6 +205,7 @@ private List<CubicBezier> toBezier (
         // unecessary split, and adds extra points to the bezier curve. To alleviate
         // this issue, we round to 1.0 when the ratio is close to 1.0.
         double ratio = Math.abs(ang2) / (TAU / 4);
+        System.out.println("ratio: "+ratio);
         if (Math.abs(1.0 - ratio) < 0.0000001) {
             ratio = 1.0;
         }
