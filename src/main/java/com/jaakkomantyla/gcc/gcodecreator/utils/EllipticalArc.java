@@ -192,10 +192,10 @@ private List<CubicBezier> toBezier (
                 pyp
         );
 
-        double centerx = centersAndAngles[1];
-        double centery = centersAndAngles[2];
-        double ang1 = centersAndAngles[3];
-        double ang2 = centersAndAngles[4];
+        double centerx = centersAndAngles[0];
+        double centery = centersAndAngles[1];
+        double ang1 = centersAndAngles[2];
+        double ang2 = centersAndAngles[3];
 
         // If 'ang2' == 90.0000000001, then `ratio` will evaluate to
         // 1.0000000001. This causes `segments` to be greater than one, which is an
