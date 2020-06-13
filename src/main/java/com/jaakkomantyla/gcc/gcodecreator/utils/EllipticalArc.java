@@ -48,9 +48,10 @@ public class EllipticalArc {
         // as derived from http://spencermortensen.com/articles/bezier-circle
         System.out.println("ang2 = "+ang2);
         double a;
-        if(ang2 == 1.5707963267948966){
+
+        if(ang2 == 1.5707961751138155){
             a =  0.551915024494;
-        }else if(ang2 == -1.5707963267948966){
+        }else if(ang2 == -1.5707961751138155){
             a =  -0.551915024494;
         }else{
             a=4 / 3 * Math.tan(ang2 / 4);
