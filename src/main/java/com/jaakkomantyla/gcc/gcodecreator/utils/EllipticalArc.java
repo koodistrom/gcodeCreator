@@ -206,7 +206,7 @@ private List<CubicBezier> toBezier (
         // this issue, we round to 1.0 when the ratio is close to 1.0.
         double ratio = Math.abs(ang2) / (TAU / 4);
         System.out.println("ratio: "+ratio);
-        if (Math.abs(1.0 - ratio) < 0.0000001) {
+        if (Math.abs(1.0 - ratio) < 0.00001) {
             ratio = 1.0;
         }
 
