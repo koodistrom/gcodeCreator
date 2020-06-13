@@ -46,6 +46,7 @@ public class EllipticalArc {
     private List<Vector2D> approxUnitArc(double ang1, double ang2) {
         // If 90 degree circular arc, use a constant
         // as derived from http://spencermortensen.com/articles/bezier-circle
+        System.out.println("ang2 = "+ang2);
         double a;
         if(ang2 == 1.5707963267948966){
             a =  0.551915024494;
