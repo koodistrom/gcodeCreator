@@ -40,11 +40,21 @@ public class ToGCodeHandler extends DefaultPathHandler {
     }
     @Override
     public void arcAbs(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
-
+        Vector2D previousPoint = new Vector2D(gCode.getCurrentX(), gCode.getCurrentY());
+        int largeArc = largeArcFlag? 1:0;
+        int sweep = sweepFlag? 1:0;
+        EllipticalArc arc = new EllipticalArc(previousPoint, rx, ry, xAxisRotation, largeArc, sweep, x, y);
+        List<CubicBezier> beziers = arc.toCubicBezier();
+        beziers.forEach( curve -> addBezierToGcode(curve));
     }
     @Override
     public void arcRel(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
-
+        Vector2D previousPoint = new Vector2D(gCode.getCurrentX(), gCode.getCurrentY());
+        int largeArc = largeArcFlag? 1:0;
+        int sweep = sweepFlag? 1:0;
+        EllipticalArc arc = new EllipticalArc(previousPoint, rx, ry, xAxisRotation, largeArc, sweep, x, y);
+        List<CubicBezier> beziers = arc.toCubicBezier();
+        beziers.forEach( curve -> addBezierToGcode(curve));
     }
     @Override
     public void closePath() {
