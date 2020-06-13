@@ -249,9 +249,10 @@ public class Gcode {
      * Print commands.
      */
     public void printCommands(){
-        commands.forEach(command -> {
-            System.out.println(command);
-        });
+        String str = commandsAsString(header);
+        str +=  commandsAsString(commands);
+        str +=  commandsAsString(footer);
+        System.out.println(str);
     }
 
     /**

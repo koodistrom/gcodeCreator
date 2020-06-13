@@ -242,12 +242,12 @@ public class  Command {
         String str;
         if(code != null){
             str = code + " ";
-            if(x!=null){str+="X"+x+" ";}
-            if(y!=null){str+="Y"+y+" ";}
-            if(z!=null){str+="Z"+z+" ";}
-            if(i!=null){str+="I"+i+" ";}
-            if(j!=null){str+="J"+j+" ";}
-            if(f!=null){str+="F"+f+" ";}
+            if(x!=null){str+="X"+String.format("%.6f",x)+" ";}
+            if(y!=null){str+="Y"+String.format("%.6f",y)+" ";}
+            if(z!=null){str+="Z"+String.format("%.6f",z)+" ";}
+            if(i!=null){str+="I"+String.format("%.6f",i)+" ";}
+            if(j!=null){str+="J"+String.format("%.6f",j)+" ";}
+            if(f!=null){str+="F"+String.format("%.6f",f)+" ";}
         }else{
             str = "("+comment+")";
         }
