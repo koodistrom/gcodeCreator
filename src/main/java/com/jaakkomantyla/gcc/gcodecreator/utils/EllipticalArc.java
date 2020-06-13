@@ -46,13 +46,13 @@ public class EllipticalArc {
     private List<Vector2D> approxUnitArc(double ang1, double ang2) {
         // If 90 degree circular arc, use a constant
         // as derived from http://spencermortensen.com/articles/bezier-circle
-        System.out.println("ang2 = "+ang2);
+        //System.out.println("ang2 = "+ang2);
         double a;
         double quarterTurn =  1.5707961751138155;
         double quarterTurn2 =  0.7853983718506589;
-        if(ang2 == -1){
+        if(Math.abs(ang2 - quarterTurn)<0.00001 || Math.abs(ang2 - quarterTurn2)<0.00001){
             a =  0.551915024494;
-        }else if(ang2 == -1){
+        }else if(Math.abs(ang2 + quarterTurn)<0.00001 || Math.abs(ang2 + quarterTurn2)<0.00001){
             a =  -0.551915024494;
         }else{
             a=4 / 3 * Math.tan(ang2 / 4);
@@ -205,7 +205,7 @@ private List<CubicBezier> toBezier (
         // unecessary split, and adds extra points to the bezier curve. To alleviate
         // this issue, we round to 1.0 when the ratio is close to 1.0.
         double ratio = Math.abs(ang2) / (TAU / 4);
-        System.out.println("ratio: "+ratio);
+        //System.out.println("ratio: "+ratio);
         if (Math.abs(1.0 - ratio) < 0.00001) {
             ratio = 1.0;
         }
@@ -227,7 +227,9 @@ private List<CubicBezier> toBezier (
     Vector2D point1 = mapToEllipse(curve.get( 0 ), finalRx, finalRy, cosphi, sinphi, centerx, centery);
     Vector2D point2 = mapToEllipse(curve.get(1), finalRx, finalRy, cosphi, sinphi, centerx, centery);
     Vector2D endPoint = mapToEllipse(curve.get( 2), finalRx, finalRy, cosphi, sinphi, centerx, centery);
-    curvesToReturn.add(new CubicBezier(startPoint.get(0), point1, point2, endPoint));
+    CubicBezier c = new CubicBezier(startPoint.get(0), point1, point2, endPoint);
+        System.out.println(c);
+    curvesToReturn.add(c);
     startPoint.remove(0);
     startPoint.add(endPoint);
     });
