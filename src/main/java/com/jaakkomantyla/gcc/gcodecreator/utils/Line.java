@@ -105,13 +105,15 @@ public class Line {
 
         private static float calculateSlope(Vector2D p1, Vector2D p2)
         {
-            if(p2.getX() == p1.getX())
+            if(Math.abs(p2.getX() - p1.getX())< 0.00001)
             {
                 return Float.NaN;
             }
             else
             {
-                return (float)((p2.getY() - p1.getY()) / (p2.getX() - p1.getX()));
+                double y = p2.getY() - p1.getY();
+                y = Math.abs(y)<0.00001? 0:y;
+                return (float)(y / (p2.getX() - p1.getX()));
             }
         }
 

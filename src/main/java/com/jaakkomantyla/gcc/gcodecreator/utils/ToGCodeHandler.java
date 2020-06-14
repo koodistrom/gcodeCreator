@@ -20,7 +20,8 @@ public class ToGCodeHandler extends DefaultPathHandler {
     private float curveSamplingStep;
     private float pathStartX;
     private float pathStartY;
-
+    private float previousX;
+    private float previousY;
     /**
      * Instantiates a new  ToGCodeHandler.
      *
@@ -30,13 +31,13 @@ public class ToGCodeHandler extends DefaultPathHandler {
         super();
         this.gCode = gCode;
         curveAprTolerance = 0.5f;
-        curveSamplingStep = 10;
+        curveSamplingStep = 8;
 
     }
     @Override
     public void startPath(){
-        pathStartX = gCode.getCurrentX();
-        pathStartY = gCode.getCurrentY();
+        previousX = 0;
+        previousY = 0;
     }
     @Override
     public void arcAbs(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
@@ -165,7 +166,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
     public void movetoRel(float x, float y){
 
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzMoveHeight()));
-        gCode.addCommand(new Command(Code.G00, x, y));
+        gCode.addCommand(new Command(Code.G00, x+previousX, y+previousY));
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzWorkHeight()));
         pathStartX = gCode.getCurrentX();
         pathStartY = gCode.getCurrentY();
@@ -204,4 +205,8 @@ public class ToGCodeHandler extends DefaultPathHandler {
     }
 
 
+    private void setPreviousPoints(){
+        previousY = gCode.getCurrentY();
+        previousX = gCode.getCurrentX();
+    }
 }

@@ -1,5 +1,7 @@
 package com.jaakkomantyla.gcc.gcodecreator.gcode;
 
+import java.util.Locale;
+
 /**
  * The Command class represents command written to gcode file that specifies a operation on CNC-machine.
  * Command holds an enum Code and parameters (coordinates and speeds) and possibly a comment
@@ -242,11 +244,11 @@ public class  Command {
         String str;
         if(code != null){
             str = code + " ";
-            if(x!=null){str+="X"+String.format("%.2f",x)+" ";}
-            if(y!=null){str+="Y"+String.format("%.2f",y)+" ";}
-            if(z!=null){str+="Z"+String.format("%.2f",z)+" ";}
-            if(i!=null){str+="I"+String.format("%.2f",i)+" ";}
-            if(j!=null){str+="J"+String.format("%.2f",j)+" ";}
+            if(x!=null){str+="X"+String.format(Locale.ROOT,"%.2f",x)+" ";}
+            if(y!=null){str+="Y"+String.format(Locale.ROOT,"%.2f",y)+" ";}
+            if(z!=null){str+="Z"+String.format(Locale.ROOT,"%.2f",z)+" ";}
+            if(i!=null){str+="I"+String.format(Locale.ROOT,"%.2f",i)+" ";}
+            if(j!=null){str+="J"+String.format(Locale.ROOT,"%.2f",j)+" ";}
             if(f!=null){str+="F"+f+" ";}
         }else{
             str = "("+comment+")";
