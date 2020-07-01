@@ -14,6 +14,7 @@ public class Options {
      * Instantiates a new Options.
      */
     public Options() {
+        this.units = "mm";
     }
 
     /**

@@ -38,10 +38,12 @@ public class ToGCodeHandler extends DefaultPathHandler {
     public void startPath(){
         previousX = 0;
         previousY = 0;
+        pathStartY = 0;
+        pathStartX = 0;
     }
     @Override
     public void arcAbs(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
-        Vector2D previousPoint = new Vector2D(gCode.getCurrentX(), gCode.getCurrentY());
+        Vector2D previousPoint = new Vector2D(previousX, previousY);
         int largeArc = largeArcFlag? 1:0;
         int sweep = sweepFlag? 1:0;
         EllipticalArc arc = new EllipticalArc(previousPoint, rx, ry, xAxisRotation, largeArc, sweep, x, y);
@@ -50,10 +52,10 @@ public class ToGCodeHandler extends DefaultPathHandler {
     }
     @Override
     public void arcRel(float rx, float ry, float xAxisRotation, boolean largeArcFlag, boolean sweepFlag, float x, float y) {
-        Vector2D previousPoint = new Vector2D(gCode.getCurrentX(), gCode.getCurrentY());
+        Vector2D previousPoint = new Vector2D(previousX, previousY);
         int largeArc = largeArcFlag? 1:0;
         int sweep = sweepFlag? 1:0;
-        EllipticalArc arc = new EllipticalArc(previousPoint, rx, ry, xAxisRotation, largeArc, sweep, x, y);
+        EllipticalArc arc = new EllipticalArc(previousPoint, rx, ry, xAxisRotation, largeArc, sweep, x+previousX, y+previousY);
         List<CubicBezier> beziers = arc.toCubicBezier();
         beziers.forEach( curve -> addBezierToGcode(curve));
     }
@@ -64,13 +66,12 @@ public class ToGCodeHandler extends DefaultPathHandler {
 
     @Override
     public void curvetoCubicRel(float x1, float y1, float x2, float y2, float x, float y){
-        System.out.println("hadler method called");
-        float curX = gCode.getCurrentX();
-        float curY = gCode.getCurrentY();
-        Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
-        Vector2D c1 = new Vector2D(curX+x1,curY+y1);
-        Vector2D c2 = new Vector2D(curX+x2,curY+y2);
-        Vector2D p2 = new Vector2D(curX+x,curY+y);
+
+
+        Vector2D p1 = new Vector2D(previousX,previousY);
+        Vector2D c1 = new Vector2D(previousX+x1,previousY+y1);
+        Vector2D c2 = new Vector2D(previousX+x2,previousY+y2);
+        Vector2D p2 = new Vector2D(previousX+x,previousY+y);
         addBezierToGcode(new CubicBezier(p1,c1,c2,p2));
 
     }
@@ -78,7 +79,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
     @Override
     public void curvetoCubicAbs(float x1, float y1, float x2, float y2, float x, float y) {
 
-        Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
+        Vector2D p1 = new Vector2D(previousX,previousY);
         Vector2D c1 = new Vector2D(x1,y1);
         Vector2D c2 = new Vector2D(x2,y2);
         Vector2D p2 = new Vector2D(x,y);
@@ -99,7 +100,7 @@ public class ToGCodeHandler extends DefaultPathHandler {
 
     @Override
     public void 	curvetoQuadraticAbs(float x1, float y1, float x, float y){
-        Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
+        Vector2D p1 = new Vector2D(previousX,previousY);
         Vector2D c1 = new Vector2D(x1,y1);
         Vector2D p2 = new Vector2D(x,y);
 
@@ -110,11 +111,9 @@ public class ToGCodeHandler extends DefaultPathHandler {
     @Override
     public void 	curvetoQuadraticRel(float x1, float y1, float x, float y){
         System.out.println("hadler method called");
-        float curX = gCode.getCurrentX();
-        float curY = gCode.getCurrentY();
-        Vector2D p1 = new Vector2D(gCode.getCurrentX(),gCode.getCurrentY());
-        Vector2D c1 = new Vector2D(curX+x1,curY+y1);
-        Vector2D p2 = new Vector2D(curX+x,curY+y);
+        Vector2D p1 = new Vector2D(previousX,previousY);
+        Vector2D c1 = new Vector2D(previousX+x1,previousY+y1);
+        Vector2D p2 = new Vector2D(previousX+x,previousY+y);
 
         CubicBezier cb = CubicBezier.fromQuadratic(p1,c1,p2);
         addBezierToGcode(cb);
@@ -133,34 +132,41 @@ public class ToGCodeHandler extends DefaultPathHandler {
     @Override
     public void 	linetoAbs(float x, float y){
         gCode.addCommand(new Command(Code.G01, x, y));
+        setPreviousPoints();
     }
     @Override
     public void 	linetoHorizontalAbs(float x){
-        gCode.addCommand(new Command(Code.G01, x, gCode.getCurrentY()));
+        gCode.addCommand(new Command(Code.G01, x, previousY));
+        setPreviousPoints();
     }
     @Override
     public void 	linetoHorizontalRel(float x){
-        gCode.addCommand(new Command(Code.G01, x + gCode.getCurrentX(), gCode.getCurrentY()));
+        gCode.addCommand(new Command(Code.G01, x + previousX, previousY));
+        setPreviousPoints();
     }
     @Override
     public void 	linetoRel(float x, float y){
-        gCode.addCommand(new Command(Code.G01, x + gCode.getCurrentX(), y+gCode.getCurrentY()));
+        gCode.addCommand(new Command(Code.G01, x + previousX, y+previousY));
+        setPreviousPoints();
     }
     @Override
     public void 	linetoVerticalAbs(float y){
-        gCode.addCommand(new Command(Code.G01, gCode.getCurrentX(), y));
+        gCode.addCommand(new Command(Code.G01, previousX, y));
+        setPreviousPoints();
     }
     @Override
     public void 	linetoVerticalRel(float y){
-        gCode.addCommand(new Command(Code.G01, gCode.getCurrentX(), y+gCode.getCurrentY()));
+        gCode.addCommand(new Command(Code.G01, previousX, y+previousY));
+        setPreviousPoints();
     }
     @Override
     public void movetoAbs(float x, float y){
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzMoveHeight()));
         gCode.addCommand(new Command(Code.G00, x, y));
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzWorkHeight()));
-        pathStartX = gCode.getCurrentX();
-        pathStartY = gCode.getCurrentY();
+        setPreviousPoints();
+        pathStartX = previousX;
+        pathStartY = previousY;
     };
     @Override
     public void movetoRel(float x, float y){
@@ -168,8 +174,9 @@ public class ToGCodeHandler extends DefaultPathHandler {
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzMoveHeight()));
         gCode.addCommand(new Command(Code.G00, x+previousX, y+previousY));
         gCode.addCommand(new Command(Code.G00, null, null, gCode.getzWorkHeight()));
-        pathStartX = gCode.getCurrentX();
-        pathStartY = gCode.getCurrentY();
+        setPreviousPoints();
+        pathStartX = previousX;
+        pathStartY = previousY;
         /*svg on paskaa jostain syystä ilmeisesti m relative toimii samoin kuin M absoluuttinen joten
         kommentoin nämä pois ja kokeilen tuikata tuon absoluuttisen tähän
 
@@ -188,11 +195,11 @@ public class ToGCodeHandler extends DefaultPathHandler {
         Code code = arc.isClockwise() ? Code.G03 : Code.G02;
         float x =  (float) arc.getEnd().getX();
         float y = (float) arc.getEnd().getY();
-        float i = (float) arc.getCenter().getX()-gCode.getCurrentX();
-        float j = (float) arc.getCenter().getY()-gCode.getCurrentY();
+        float i = (float) arc.getCenter().getX()-previousX;
+        float j = (float) arc.getCenter().getY()-previousY;
         Command cmd = new Command(code, x, y, i, j);
         gCode.addCommand(cmd);
-
+        setPreviousPoints();
     }
 
     private void addBezierToGcode(CubicBezier cb){

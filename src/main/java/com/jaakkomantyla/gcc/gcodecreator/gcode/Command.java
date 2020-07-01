@@ -86,11 +86,11 @@ public class  Command {
      * Instantiates a new Command.
      *
      * @param code the code
-     * @param f    the f
+     * @param fValue    the f
      */
-    public Command(Code code, Float f) {
+    public Command(Code code, Float fValue) {
         this.code = code;
-        this.f = f;
+        this.f = fValue;
     }
 
     /**

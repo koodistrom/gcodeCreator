@@ -1,5 +1,8 @@
 package com.jaakkomantyla.gcc.gcodecreator.gcode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,15 +27,19 @@ public class Gcode {
      */
     public Gcode(){
         commands = new LinkedList<Command>();
-        header = new LinkedList<Command>();
-        footer = new LinkedList<Command>();
+
         commands.add(new Command(fileInfo));
         currentX = 0;
         currentY =0;
         currentZ = 0;
         options = new Options();
+        options.setFeed(4000);
         options.setWorkDepth(0);
         options.setMoveDepth(2);
+        header = new LinkedList<Command>();
+        footer = new LinkedList<Command>();
+        createDefaultHeader(options);
+        createDefaultFooter(options);
     }
 
     /**
@@ -279,6 +286,20 @@ public class Gcode {
         str +=  commandsAsString(commands);
         str +=  commandsAsString(footer);
         return str.getBytes();
+    }
+
+    public void saveToFile(String filePath){
+
+        File file = new File(filePath);
+        try {
+            OutputStream os = new FileOutputStream(file);
+            os.write(commandsAsByteArray());
+            System.out.println("File successfully wrote");
+            os.close();
+        }
+        catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
     }
 
     @Override

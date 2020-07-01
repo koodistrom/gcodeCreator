@@ -29,7 +29,5 @@ public enum Code {
      * G 21 code. imperial
      */
     G21, //imperial
-    /**
-     * F code. feedrate
-     */
+
 }
