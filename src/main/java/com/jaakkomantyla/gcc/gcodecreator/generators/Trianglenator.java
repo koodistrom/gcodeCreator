@@ -3,6 +3,7 @@ package com.jaakkomantyla.gcc.gcodecreator.generators;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Code;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Command;
 import com.jaakkomantyla.gcc.gcodecreator.gcode.Gcode;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 public class Trianglenator {
     public static void main(String[] args) {
@@ -33,38 +34,48 @@ public class Trianglenator {
     }
 
     private static void createTriangles(Gcode gcode, float height, float width){
-        float triangleSide = height/20;
+        float triangleSide = height/30;
         float triangleHeight = (float) Math.sqrt(triangleSide*triangleSide-(triangleSide/2)*(triangleSide/2));
-        float x = gcode.getCurrentX();
-        float y = gcode.getCurrentY();
+        Vector2D loc = new Vector2D(gcode.getCurrentX(),gcode.getCurrentY());
         gcode.printCommands();
-        while (x>0&&y>0&&x<width&&y<height){
-            int random = (int) (Math.random()*7);
-            switch (random){
-                case 0:
-                    x += triangleSide;
-                    break;
-                case 1:
-                    x -= triangleSide;
-                case 2:
-                    x -= triangleSide/2;
-                    y += triangleHeight;
-                    break;
-                case 3:
-                    x -= triangleSide/2;
-                    y -= triangleHeight;
-                    break;
-                case 4:
-                    x += triangleSide/2;
-                    y -= triangleHeight;
-                    break;
-                case 5:
-                    x += triangleSide/2;
-                    y += triangleHeight;
-                    break;
-            }
-            gcode.addCommand(new Command(Code.G01, x,y));
+        while (loc.getX()>0&&loc.getY()>0&&loc.getX()<width&&loc.getY()<height){
+            int random = (int) (Math.random()*6);
+            loc = moveToDirection(random, loc, triangleSide, triangleHeight);
+            gcode.addCommand(new Command(Code.G01, (float) loc.getX(),(float) loc.getY()));
+            loc = moveToDirection((random+2)%6, loc, triangleSide, triangleHeight);
+            gcode.addCommand(new Command(Code.G01, (float) loc.getX(),(float) loc.getY()));
         }
+
+    }
+
+    private static Vector2D moveToDirection(int direction, Vector2D loc, float triangleSide, float triangleHeight){
+        float x = (float) loc.getX();
+        float y = (float) loc.getY();
+        switch (direction){
+            case 0:
+                x += triangleSide;
+                break;
+            case 1:
+                x += triangleSide/2;
+                y -= triangleHeight;
+                break;
+            case 2:
+                x -= triangleSide/2;
+                y -= triangleHeight;
+                break;
+            case 3:
+                x -= triangleSide;
+                break;
+            case 4:
+                x -= triangleSide/2;
+                y += triangleHeight;
+                break;
+            case 5:
+                x += triangleSide/2;
+                y += triangleHeight;
+                break;
+        }
+        return new Vector2D(x,y);
 
     }
 

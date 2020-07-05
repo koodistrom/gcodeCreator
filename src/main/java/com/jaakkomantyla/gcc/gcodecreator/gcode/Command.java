@@ -244,11 +244,11 @@ public class  Command {
         String str;
         if(code != null){
             str = code + " ";
-            if(x!=null){str+="X"+String.format(Locale.ROOT,"%.2f",x)+" ";}
-            if(y!=null){str+="Y"+String.format(Locale.ROOT,"%.2f",y)+" ";}
-            if(z!=null){str+="Z"+String.format(Locale.ROOT,"%.2f",z)+" ";}
-            if(i!=null){str+="I"+String.format(Locale.ROOT,"%.2f",i)+" ";}
-            if(j!=null){str+="J"+String.format(Locale.ROOT,"%.2f",j)+" ";}
+            if(x!=null){str+="X"+String.format(Locale.ROOT,"%.4f",x)+" ";}
+            if(y!=null){str+="Y"+String.format(Locale.ROOT,"%.4f",y)+" ";}
+            if(z!=null){str+="Z"+String.format(Locale.ROOT,"%.4f",z)+" ";}
+            if(i!=null){str+="I"+String.format(Locale.ROOT,"%.4f",i)+" ";}
+            if(j!=null){str+="J"+String.format(Locale.ROOT,"%.4f",j)+" ";}
             if(f!=null){str+="F"+f+" ";}
         }else{
             str = "("+comment+")";
